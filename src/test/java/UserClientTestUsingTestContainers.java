@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Testcontainers
-public class UserClientTestUsingTestContainers {
+class UserClientTestUsingTestContainers {
 
     @Container
     static WireMockContainer container = new WireMockContainer("wiremock/users");

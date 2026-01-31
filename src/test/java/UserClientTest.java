@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @WireMockTest
-public class UserClientTest {
+class UserClientTest {
 
     @Test
     void findAllTest(WireMockRuntimeInfo wmRuntimeInfo) {
