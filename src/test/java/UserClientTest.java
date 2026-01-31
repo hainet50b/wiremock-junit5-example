@@ -7,10 +7,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 @WireMockTest
 class UserClientTest {
@@ -44,6 +42,32 @@ class UserClientTest {
                 () -> assertEquals(2, users.size()),
                 () -> assertEquals(new User(1, "hainet50b"), users.get(1)),
                 () -> assertEquals(new User(2, "programacho.com"), users.get(2))
+        );
+    }
+
+    @Test
+    void findAllTest_clientError(WireMockRuntimeInfo wmRuntimeInfo) {
+        WireMock wireMock = wmRuntimeInfo.getWireMock();
+        wireMock.register(get("/users").willReturn(aResponse().withStatus(400)));
+
+        UserClient sut = new UserClientImpl(wmRuntimeInfo.getHttpBaseUrl());
+
+        assertThrows(
+                HttpClientErrorException.class,
+                sut::findAll
+        );
+    }
+
+    @Test
+    void findAllTest_serverError(WireMockRuntimeInfo wmRuntimeInfo) {
+        WireMock wireMock = wmRuntimeInfo.getWireMock();
+        wireMock.register(get("/users").willReturn(aResponse().withStatus(500)));
+
+        UserClient sut = new UserClientImpl(wmRuntimeInfo.getHttpBaseUrl());
+
+        assertThrows(
+                HttpServerErrorException.class,
+                sut::findAll
         );
     }
 }
