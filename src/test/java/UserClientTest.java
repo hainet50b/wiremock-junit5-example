@@ -18,6 +18,7 @@ public class UserClientTest {
     @Test
     void findAllTest(WireMockRuntimeInfo wmRuntimeInfo) {
         WireMock wireMock = wmRuntimeInfo.getWireMock();
+        // @formatter:off
         wireMock.register(get("/users").willReturn(okJson("""
                 [
                   {
@@ -31,6 +32,7 @@ public class UserClientTest {
                 ]
                 """
         )));
+        // @formatter:on
 
         UserClient sut = new UserClientImpl(wmRuntimeInfo.getHttpBaseUrl());
 
