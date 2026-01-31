@@ -29,6 +29,13 @@ public class UserClientImpl implements UserClient {
                     HttpResponse.BodyHandlers.ofString()
             );
 
+            int statusCode = response.statusCode();
+            if (statusCode >= 400 && statusCode <= 499) {
+                throw new HttpClientErrorException();
+            } else if (statusCode >= 500 && statusCode <= 599) {
+                throw new HttpServerErrorException();
+            }
+
             ObjectMapper objectMapper = new ObjectMapper();
             return objectMapper.readValue(
                     response.body(),
