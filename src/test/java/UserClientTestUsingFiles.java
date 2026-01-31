@@ -4,12 +4,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class UserClientTestUsingFiles {
 
@@ -34,6 +35,42 @@ public class UserClientTestUsingFiles {
                 () -> assertEquals(2, users.size()),
                 () -> assertEquals(new User(1, "hainet50b"), users.get(1)),
                 () -> assertEquals(new User(2, "programacho.com"), users.get(2))
+        );
+    }
+
+    @Test
+    void findAllTest_clientError() {
+        WireMockRuntimeInfo wmRuntimeInfo = wmExtension.getRuntimeInfo();
+        wmRuntimeInfo.getWireMock()
+                .getStubMapping(UUID.fromString("6f33f78c-da9d-4599-8621-3887e02ec1df")).getItem()
+                .setResponse(aResponse()
+                        .withStatus(400)
+                        .build()
+                );
+
+        UserClient sut = new UserClientImpl(wmRuntimeInfo.getHttpBaseUrl());
+
+        assertThrows(
+                HttpClientErrorException.class,
+                sut::findAll
+        );
+    }
+
+    @Test
+    void findAllTest_serverError() {
+        WireMockRuntimeInfo wmRuntimeInfo = wmExtension.getRuntimeInfo();
+        wmRuntimeInfo.getWireMock()
+                .getStubMapping(UUID.fromString("6f33f78c-da9d-4599-8621-3887e02ec1df")).getItem()
+                .setResponse(aResponse()
+                        .withStatus(500)
+                        .build()
+                );
+
+        UserClient sut = new UserClientImpl(wmRuntimeInfo.getHttpBaseUrl());
+
+        assertThrows(
+                HttpServerErrorException.class,
+                sut::findAll
         );
     }
 
