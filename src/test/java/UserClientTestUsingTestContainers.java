@@ -1,6 +1,9 @@
 import com.github.tomakehurst.wiremock.client.HttpAdminClient;
 import com.github.tomakehurst.wiremock.stubbing.StubMapping;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
@@ -12,11 +15,18 @@ import java.util.stream.Collectors;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static org.junit.jupiter.api.Assertions.*;
 
+@Execution(ExecutionMode.SAME_THREAD)
 @Testcontainers
 class UserClientTestUsingTestContainers {
 
     @Container
     static WireMockContainer container = new WireMockContainer("wiremock/users");
+
+    @BeforeEach
+    void resetStubs() {
+        HttpAdminClient client = new HttpAdminClient(container.getHost(), container.getMappedPort(8080));
+        client.resetToDefaultMappings();
+    }
 
     @Test
     void findAllTest() {
