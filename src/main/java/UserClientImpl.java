@@ -10,7 +10,7 @@ import java.util.List;
 
 public class UserClientImpl implements UserClient {
 
-    private String baseUrl;
+    private final String baseUrl;
 
     public UserClientImpl(String baseUrl) {
         this.baseUrl = baseUrl;
